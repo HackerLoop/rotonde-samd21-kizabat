@@ -5,6 +5,8 @@
 #include "tasks/modules.h"
 #include "tasks/stream.h"
 
+#include "HAL/pwm.h"
+
 int main (void)
 {
 	irq_initialize_vectors();
@@ -13,7 +15,24 @@ int main (void)
 	system_init();
 	sleepmgr_init();
 	
+	delay_init();
+	
 	HAL_usb_init();
+	
+	pwm_instance  pwm1, pwm2;
+	pwm1 = HAL_pwn_init(PIN_PB02E_TC6_WO0 ,MUX_PB02E_TC6_WO0 ,PIN_PB03E_TC6_WO1, MUX_PB03E_TC6_WO1 , TC6 );
+	pwm2 = HAL_pwn_init(PIN_PB10E_TC5_WO0 ,MUX_PB10E_TC5_WO0 ,PIN_PB11E_TC5_WO1, MUX_PB11E_TC5_WO1, TC5 );
+	
+	while(1){
+	for(int i = 0 ; i < 100 ; i++){
+	HAL_pwn_set(&pwm1, i, 0);
+	HAL_pwn_set(&pwm1, i, 1);
+	HAL_pwn_set(&pwm2, i, 0);
+	HAL_pwn_set(&pwm2, i, 1);
+	delay_ms(1000);
+	}
+	}
+
 	
 	module_in = xQueueCreate(MODULE_QUEUE_LENGTH , MODULE_QUEUE_ITEM_SIZE);
 	module_out = xQueueCreate(MODULE_QUEUE_LENGTH , MODULE_QUEUE_ITEM_SIZE);
